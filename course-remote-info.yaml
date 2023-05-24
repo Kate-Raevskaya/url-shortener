@@ -3,7 +3,7 @@ hyperskill_project:
   ide_files: https://stepik.org/media/attachments/lesson/923774/additional_files.json
   is_template_based: false
   use_ide: true
-update_date: "Wed, 17 May 2023 11:48:20 UTC"
+update_date: "Wed, 24 May 2023 10:15:17 UTC"
 stages:
 - id: 1840
   step: 26973
@@ -16,10 +16,10 @@ stages:
   is_completed: true
 - id: 1843
   step: 26976
-  is_completed: false
+  is_completed: true
 - id: 1844
   step: 26977
-  is_completed: false
+  is_completed: true
 topics:
   0:
   - title: Interface elements

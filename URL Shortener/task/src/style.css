@@ -1,3 +1,16 @@
 .error-visibility {
     display: none;
 }
+
+#list-url {
+    border-radius: 15px;
+}
+
+.list-element {
+    padding: 7px 0;
+}
+
+.full-url {
+    /*white-space: nowrap;*/
+    word-break: break-all;
+}

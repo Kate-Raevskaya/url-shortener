@@ -4,6 +4,33 @@ let listOfUrl = document.getElementById('list-url');
 let errorMessage = document.getElementById('error-message');
 let deleteButton = document.getElementById('button-delete');
 
+let urls = [];
+
+class Url {
+    constructor(fullUrl) {
+        this.click = 0;
+        this.randomPart = generateRandomString(5);
+        this.fullUrl = fullUrl;
+        this.updating = false;
+    }
+
+    get shortUrl() {
+        return `localhost/${this.randomPart}`;
+    }
+}
+
+function createNewUrl() {
+    let userUrl = userInput.value;
+    return new Url(userUrl);
+}
+
+function update() {
+    listOfUrl.replaceChildren();
+    for (let url of urls) {
+        displayUrl(url);
+    }
+}
+
 
 function checkUrl() {
     let userUrl = userInput.value;
@@ -23,36 +50,71 @@ function generateRandomString(length) {
     return result;
 }
 
-function createShortUrl() {
+function displayUrl(url) {
+    let listElement = document.createElement('li');
+    listElement.classList.add('list-element');
+
+    let fullUrl = document.createElement('p');
+    fullUrl.innerText = ` - ${url.fullUrl}`;
+    fullUrl.classList.add('full-url');
+
+    let userEditUrl = document.createElement('input');
+    userEditUrl.value = url.randomPart;
+    userEditUrl.classList.add('form-control', 'border', 'border-3', 'border-primary', 'w-25', 'd-inline');
+
     let shortUrl = document.createElement('a');
-    let randomString = generateRandomString(5);
-    let userUrl = userInput.value;
-    // shortUrl.setAttribute('id', 'short-url');
-    shortUrl.setAttribute('href', userUrl);
+    shortUrl.setAttribute('href', url.fullUrl);
     shortUrl.setAttribute('target', '_blank');
     shortUrl.setAttribute('rel', 'noopener noreferrer');
-    shortUrl.innerText = `localhost/${randomString}`;
-    let listElement = document.createElement('li');
-    listElement.innerText = ` - ${userUrl}`;
-    listElement.insertAdjacentElement('afterbegin', shortUrl);
+    shortUrl.innerText = url.shortUrl;
+
+    let editButton = document.createElement('button');
+    editButton.innerText = 'Edit';
+    editButton.classList.add('btn', 'btn-primary', 'ms-3');
+
+    // listElement.insertAdjacentElement('afterbegin', shortUrl);
+    fullUrl.insertAdjacentElement('afterbegin', shortUrl);
+    listElement.insertAdjacentElement('afterbegin', fullUrl);
+
+    // listElement.insertAdjacentElement('beforeend', fullUrl);
+
     let clickCount = document.createElement('span');
-    let count = 0;
-    clickCount.innerText = ` - Click: ${count}`;
+    clickCount.innerText = ` - Clicks: ${url.click} `;
     listElement.insertAdjacentElement('beforeend', clickCount);
+
     shortUrl.addEventListener('click', () => {
-        count += 1;
-        clickCount.innerText = ` - Clicks: ${count}`;
+        url.click +=1;
+        clickCount.innerText = ` - Clicks: ${url.click} `;
     });
 
-    return listElement;
+    listElement.insertAdjacentElement('beforeend', editButton);
+
+
+    editButton.addEventListener('click', () => {
+        if (url.updating) {
+            url.updating = false;
+            editButton.innerText = 'Edit';
+            url.randomPart = userEditUrl.value;
+            shortUrl.innerText = url.shortUrl;
+            fullUrl.replaceChild(shortUrl, userEditUrl);
+        } else {
+            url.updating = true;
+            fullUrl.replaceChild(userEditUrl, shortUrl);
+            editButton.innerText = 'Save';
+        }
+    })
+
+    listOfUrl.appendChild(listElement);
 }
+
 
 
 createButton.addEventListener('click', () => {
     if (checkUrl()) {
         errorMessage.classList.add('error-visibility');
-        let url = createShortUrl();
-        listOfUrl.appendChild(url);
+        let url = createNewUrl();
+        urls.push(url);
+        displayUrl(url);
     } else {
         errorMessage.classList.remove('error-visibility');
     }
@@ -61,13 +123,9 @@ createButton.addEventListener('click', () => {
 deleteButton.addEventListener('click', () => {
     let userUrl = userInput.value;
     if (userUrl === "") {
-        listOfUrl.replaceChildren();
+        urls = [];
     }
-    for (let listElement of listOfUrl.children) {
-        let shortUrl = listElement.querySelector('a');
-        let description = (listElement.childNodes[1].nodeValue).substring(3);
-        if (userUrl === shortUrl.textContent || userUrl === description) {
-            setTimeout(() => {listElement.remove()}, 0)
-        }
-    }
+    urls = urls.filter(url => userUrl !== url.shortUrl && userUrl !== url.fullUrl);
+
+    update();
 })
